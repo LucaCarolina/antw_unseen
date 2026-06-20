@@ -1,8 +1,6 @@
 import { put } from '@vercel/blob';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-export const config = { api: { bodyParser: false } };
-
 function readBody(req: VercelRequest): Promise<Buffer> {
     return new Promise((resolve, reject) => {
         const chunks: Buffer[] = [];
