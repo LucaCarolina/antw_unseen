@@ -1,0 +1,103 @@
+/* FilterMenu — right-side vertical panel */
+/* Hidden on mobile (<48em) — FilterBottomSheet handles that breakpoint */
+
+@media (max-width: 48em) {
+    .filter-menu { display: none !important; }
+}
+
+.filter-menu {
+    position: fixed;
+    top: 50%;
+    right: 2.5rem;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-3);
+    font-family: var(--font-mono);
+    pointer-events: auto;
+    z-index: 10;
+    max-height: 80vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.filter-menu::-webkit-scrollbar { display: none; }
+
+/* ── "all" row ── */
+.filter-menu__all {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: rgba(240, 237, 232, 0.35);
+    text-align: right;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.filter-menu__all:hover { color: rgba(240, 237, 232, 0.7); }
+
+.filter-menu__all.is-active,
+.filter-menu__all.is-active .filter-menu__count {
+    color: var(--primitive-white);
+    opacity: 1;
+}
+
+.filter-menu__all-label { font-size: 0.875rem; }
+
+/* ── Category group ── */
+.filter-menu__group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-2);
+}
+
+.filter-menu__category {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+}
+
+.filter-menu__cat-label {
+    font-size: 0.875rem;
+    color: var(--primitive-white);
+    letter-spacing: 0.02em;
+}
+
+.filter-menu__count {
+    font-size: 0.68rem;
+    color: var(--primitive-white);
+    opacity: 0.35;
+    letter-spacing: 0.04em;
+}
+
+/* ── Sub-items ── */
+.filter-menu__items {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+}
+
+.filter-menu__item {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: rgba(240, 237, 232, 0.3);
+    text-align: right;
+    padding: 0;
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
+}
+
+.filter-menu__item:hover   { color: rgba(240, 237, 232, 0.65); }
+.filter-menu__item.is-active { color: var(--primitive-white); }
