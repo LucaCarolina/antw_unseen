@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { upload } from '@vercel/blob/client';
 import { supabase } from '../../../lib/supabaseClient';
 import { triggerPageTransition } from '../../globals/PixelTransition/triggerTransition';
 import BackButton from '../../atoms/BackButton/BackButton';
@@ -85,15 +86,12 @@ const SubmitFlow = () => {
                     const ext = file.name.split('.').pop() ?? 'bin';
                     const path = `${format}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
-                    const res = await fetch(`/api/upload?path=${encodeURIComponent(path)}`, {
-                        method: 'POST',
-                        body: file,
-                        headers: { 'Content-Type': file.type },
+                    const blob = await upload(path, file, {
+                        access: 'public',
+                        handleUploadUrl: '/api/upload',
                     });
-                    if (!res.ok) throw new Error(`Upload failed: ${res.statusText}`);
-                    const { url } = await res.json() as { url: string };
 
-                    fileUrl = url;
+                    fileUrl = blob.url;
                     fileName = file.name;
                 }
             }

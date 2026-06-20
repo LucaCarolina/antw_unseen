@@ -1,8 +1,5 @@
 {
-  "functions": {
-    "api/upload.ts": { "runtime": "nodejs20.x" }
-  },
-  "rewrites": [
+"rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
