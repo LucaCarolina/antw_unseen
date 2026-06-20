@@ -75,24 +75,27 @@ const SubmitFlow = () => {
             let fileUrl: string | null = null;
             let fileName: string | null = null;
 
-            // Upload file to Supabase Storage for voice / image / video formats.
+            // Upload file for voice / image / video formats.
             if (file && (format === 'voice' || format === 'image' || format === 'video')) {
-                const ext = file.name.split('.').pop() ?? 'bin';
-                // Randomise path so concurrent submissions never collide.
-                const path = `${format}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+                if (import.meta.env.DEV) {
+                    // Storage not reachable locally — use blob URL so flow is testable.
+                    fileUrl = URL.createObjectURL(file);
+                    fileName = file.name;
+                } else {
+                    const ext = file.name.split('.').pop() ?? 'bin';
+                    const path = `${format}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
-                const { error: uploadError } = await supabase.storage
-                    .from('submissions')
-                    .upload(path, file, { upsert: false });
+                    const body = new FormData();
+                    body.append('file', file);
+                    body.append('path', path);
 
-                if (uploadError) throw uploadError;
+                    const res = await fetch('/api/upload', { method: 'POST', body });
+                    if (!res.ok) throw new Error(`Upload failed: ${res.statusText}`);
+                    const { url } = await res.json() as { url: string };
 
-                const { data: urlData } = supabase.storage
-                    .from('submissions')
-                    .getPublicUrl(path);
-
-                fileUrl = urlData.publicUrl;
-                fileName = file.name;
+                    fileUrl = url;
+                    fileName = file.name;
+                }
             }
 
             // Insert the row.
