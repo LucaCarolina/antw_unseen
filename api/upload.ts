@@ -1,21 +1,27 @@
 import { put } from '@vercel/blob';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-export const config = { runtime: 'edge' };
+export const config = { api: { bodyParser: false } };
 
-export default async function handler(req: Request): Promise<Response> {
-    if (req.method !== 'POST') {
-        return new Response('Method not allowed', { status: 405 });
-    }
+function readBody(req: VercelRequest): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+        const chunks: Buffer[] = [];
+        req.on('data', (chunk: Buffer) => chunks.push(chunk));
+        req.on('end', () => resolve(Buffer.concat(chunks)));
+        req.on('error', reject);
+    });
+}
 
-    const formData = await req.formData();
-    const file = formData.get('file') as File | null;
-    const path = formData.get('path') as string | null;
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+    if (req.method !== 'POST') return res.status(405).end();
 
-    if (!file || !path) {
-        return new Response('Missing file or path', { status: 400 });
-    }
+    const path = req.query.path as string;
+    const contentType = (req.headers['content-type'] as string) ?? 'application/octet-stream';
 
-    const blob = await put(path, file, { access: 'public' });
+    if (!path) return res.status(400).json({ error: 'Missing path' });
 
-    return Response.json({ url: blob.url });
+    const body = await readBody(req);
+    const blob = await put(path, body, { access: 'public', contentType });
+
+    return res.json({ url: blob.url });
 }

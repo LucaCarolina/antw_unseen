@@ -85,11 +85,11 @@ const SubmitFlow = () => {
                     const ext = file.name.split('.').pop() ?? 'bin';
                     const path = `${format}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
-                    const body = new FormData();
-                    body.append('file', file);
-                    body.append('path', path);
-
-                    const res = await fetch('/api/upload', { method: 'POST', body });
+                    const res = await fetch(`/api/upload?path=${encodeURIComponent(path)}`, {
+                        method: 'POST',
+                        body: file,
+                        headers: { 'Content-Type': file.type },
+                    });
                     if (!res.ok) throw new Error(`Upload failed: ${res.statusText}`);
                     const { url } = await res.json() as { url: string };
 
